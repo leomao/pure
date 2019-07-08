@@ -482,7 +482,7 @@ prompt_pure_async_callback() {
 			if (( code == 0 )); then
 				unset prompt_pure_git_dirty
 			else
-				typeset -g prompt_pure_git_dirty="*"
+				typeset -g prompt_pure_git_dirty="±"
 			fi
 
 			[[ $prev_dirty != $prompt_pure_git_dirty ]] && do_render=1
@@ -718,7 +718,7 @@ prompt_pure_setup() {
 		git:branch           242
 		git:branch:cached    red
 		git:action           242
-		git:dirty            218
+		git:dirty            red
 		host                 242
 		path                 blue
 		prompt:error         red

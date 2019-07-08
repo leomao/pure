@@ -546,12 +546,28 @@ prompt_pure_reset_prompt() {
 }
 
 prompt_pure_reset_prompt_symbol() {
-	prompt_pure_state[prompt]=${PURE_PROMPT_SYMBOL:-❯}
+	prompt_pure_state[vim]="%B%F{$prompt_pure_colors[vim:insert]}I%f%b"
 }
 
 prompt_pure_update_vim_prompt_widget() {
 	setopt localoptions noshwordsplit
-	prompt_pure_state[prompt]=${${KEYMAP/vicmd/${PURE_PROMPT_VICMD_SYMBOL:-❮}}/(main|viins)/${PURE_PROMPT_SYMBOL:-❯}}
+	case $KEYMAP in
+		main|viins)
+			prompt_pure_state[vim]="%B%F{$prompt_pure_colors[vim:insert]}I%f%b"
+			;;
+		vicmd)
+			case $REGION_ACTIVE in
+				0)
+					prompt_pure_state[vim]="%B%F{$prompt_pure_colors[vim:normal]}N%f%b"
+					;;
+				1|2)
+					prompt_pure_state[vim]="%B%F{$prompt_pure_colors[vim:virtual]}V%f%b"
+			esac
+			;;
+		virep)
+			prompt_pure_state[vim]="%B%F{$prompt_pure_colors[vim:replace]}R%f%b"
+			;;
+	esac
 
 	prompt_pure_reset_prompt
 }
@@ -613,6 +629,7 @@ prompt_pure_state_setup() {
 	prompt_pure_state[version]="1.11.0"
 	prompt_pure_state+=(
 		username "$username"
+		vim      "%B%F{$prompt_pure_colors[vim:insert]}I%f%b"
 		prompt	 "${PURE_PROMPT_SYMBOL:-❯}"
 	)
 }
@@ -710,6 +727,10 @@ prompt_pure_setup() {
 		user                 242
 		user:root            default
 		virtualenv           242
+		vim:insert           119
+		vim:normal           69
+		vim:virtual          214
+		vim:replace          203
 	)
 	prompt_pure_colors=("${(@kv)prompt_pure_colors_default}")
 
@@ -728,6 +749,9 @@ prompt_pure_setup() {
 
 	# If a virtualenv is activated, display it in grey.
 	PROMPT='%(12V.%F{$prompt_pure_colors[virtualenv]}%12v%f .)'
+
+	# separate vim state
+	PROMPT+=' ${prompt_pure_state[vim]} '
 
 	# Prompt turns red if the previous command didn't exit with 0.
 	local prompt_indicator='%(?.%F{$prompt_pure_colors[prompt:success]}.%F{$prompt_pure_colors[prompt:error]})${prompt_pure_state[prompt]}%f '
